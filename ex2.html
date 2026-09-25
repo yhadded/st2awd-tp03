@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>TP03 · Ex2 — Grab & release</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@c-frame/aframe-physics-system@4.2.4/dist/aframe-physics-system.min.js"></script>
+  <script src="js/vr.js"></script>
+  <link rel="stylesheet" href="css/vr.css">
+</head>
+<body>
+  <a class="back" href="./">← TP03</a>
+  <div class="hud">
+    <b>Casque :</b> approchez la main d'un objet et serrez <b>grip</b> (gâchette latérale) pour saisir, relâchez pour lâcher ; secouez puis relâchez pour lancer.<br>
+    <b>Bureau :</b> <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> + souris, visez un objet de près et appuyez sur <kbd>G</kbd> (saisir / lâcher)
+  </div>
+
+  <a-scene shadow="type: pcfsoft" renderer="antialias: true; anisotropy: 8" background="color: #bcd9f2"
+           fog="type: linear; color: #bcd9f2; near: 18; far: 45"
+           physics="driver: local; gravity: -9.8; friction: 0.4; restitution: 0.2">
+    <a-assets>
+      <img id="floor" src="assets/floor.png">
+    </a-assets>
+
+    <a-entity light="type: ambient; intensity: 0.45"></a-entity>
+    <a-entity light="type: directional; color: #fff6e5; intensity: 1.0; castShadow: true;
+                     shadowMapWidth: 2048; shadowMapHeight: 2048; shadowBias: -0.0005;
+                     shadowCameraLeft: -10; shadowCameraRight: 10; shadowCameraTop: 10; shadowCameraBottom: -10"
+              position="4 8 3"></a-entity>
+
+    <a-plane rotation="-90 0 0" width="30" height="30" material="src: #floor; repeat: 15 15; roughness: 0.9"
+             shadow="cast: false; receive: true"></a-plane>
+    <!-- collisionneur du sol (dessus à y = 0) -->
+    <a-box static-body width="30" height="1" depth="30" position="0 -0.5 0" visible="false"></a-box>
+
+    <!-- table (statique) : plateau à 0.9 m -->
+    <a-entity position="0 0 -1.2">
+      <a-box static-body position="0 0.85 0" width="1.6" height="0.1" depth="0.8" color="#8d6e63" shadow></a-box>
+      <a-box position="-0.7 0.4 -0.3" width="0.08" height="0.8" depth="0.08" color="#6d4c41" shadow></a-box>
+      <a-box position="0.7 0.4 -0.3" width="0.08" height="0.8" depth="0.08" color="#6d4c41" shadow></a-box>
+      <a-box position="-0.7 0.4 0.3" width="0.08" height="0.8" depth="0.08" color="#6d4c41" shadow></a-box>
+      <a-box position="0.7 0.4 0.3" width="0.08" height="0.8" depth="0.08" color="#6d4c41" shadow></a-box>
+    </a-entity>
+
+    <!--
+      Objets saisissables : class="grabbable" + dynamic-body (masse, gravité, collisions).
+      Le composant grabber des mains les passe en KINEMATIC pendant la saisie.
+    -->
+    <a-box class="grabbable" position="-0.5 1.0 -1.2" width="0.18" height="0.18" depth="0.18" color="#ef5350"
+           dynamic-body="mass: 1" shadow></a-box>
+    <a-sphere class="grabbable" position="-0.15 1.03 -1.2" radius="0.12" color="#42a5f5"
+              dynamic-body="mass: 1" shadow></a-sphere>
+    <a-cylinder class="grabbable" position="0.2 1.03 -1.2" radius="0.06" height="0.24" color="#ffca28"
+                dynamic-body="mass: 0.6" shadow></a-cylinder>
+    <a-box class="grabbable" position="0.5 1.0 -1.2" width="0.3" height="0.12" depth="0.2" color="#66bb6a"
+           dynamic-body="mass: 1.5" shadow></a-box>
+    <!-- pile de cubes au sol pour tester les chutes / collisions -->
+    <a-box class="grabbable" position="1.6 0.15 -2" width="0.3" height="0.3" depth="0.3" color="#ab47bc" dynamic-body="mass: 2" shadow></a-box>
+    <a-box class="grabbable" position="1.6 0.45 -2" width="0.3" height="0.3" depth="0.3" color="#26a69a" dynamic-body="mass: 2" shadow></a-box>
+    <a-box class="grabbable" position="1.6 0.75 -2" width="0.3" height="0.3" depth="0.3" color="#ff7043" dynamic-body="mass: 2" shadow></a-box>
+
+    <a-entity id="rig" thumbstick-locomotion="leftHand: #leftHand; rightHand: #rightHand; camera: #head">
+      <a-entity id="head" camera position="0 1.6 0" look-controls wasd-controls></a-entity>
+      <a-entity id="leftHand" hand-controls="hand: left; color: #f5d0b5" grabber></a-entity>
+      <a-entity id="rightHand" hand-controls="hand: right; color: #f5d0b5" grabber></a-entity>
+    </a-entity>
+    <a-entity desktop-debug="hand: #rightHand; camera: #head"></a-entity>
+  </a-scene>
+</body>
+</html>
